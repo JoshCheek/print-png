@@ -21,7 +21,7 @@ image
       # no idea how it works, stole it from https://github.com/wvanbergen/chunky_png/blob/143dfbb768be5770b814e08518f7580dbe859bcf/lib/chunky_png/color.rb#L436
       num_shades = 24
       offset     = 232
-      color      = (r256*30 + g256*59 + b256*11) * num_shades / (256*100) + 232
+      color      = offset + (r256*30 + g256*59 + b256*11) * num_shades / (256*100)
     else
       # percentage of 256, rendered to 0-5
       num_shades = 6
@@ -32,5 +32,4 @@ image
     end
     "\e[48;5;#{color}m  \e[49m"
   }
-  .each_slice(image.width)
-  .map { |row| print *row, "\n" }
+  .each_slice(image.width) { |row| print *row, "\n" }
