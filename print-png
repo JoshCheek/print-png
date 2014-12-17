@@ -1,0 +1,36 @@
+#!/usr/bin/env ruby
+
+# prints the image to the console.
+
+gem 'chunky_png', '~> 1.3'
+require 'chunky_png'
+
+grayscale = ARGV.delete '-g'
+image     = ChunkyPNG::Image.from_file(ARGV.first)
+
+# seems to be:
+#   first 16 are system colors (8 light, 8 dark)
+#   next 6*6*6 = 216 placed at 16 through 232
+#   next 24 placed at 232 through 256
+
+image
+  .pixels
+  .map { |pixel|
+    r256, g256, b256, _ = pixel.to_s(16).rjust(8, '0').scan(/../).map { |s| s.to_i 16 }
+    if grayscale
+      # no idea how it works, stole it from https://github.com/wvanbergen/chunky_png/blob/143dfbb768be5770b814e08518f7580dbe859bcf/lib/chunky_png/color.rb#L436
+      num_shades = 24
+      offset     = 232
+      color      = (r256*30 + g256*59 + b256*11) * num_shades / (256*100) + 232
+    else
+      # percentage of 256, rendered to 0-5
+      num_shades = 6
+      r = [r256 * num_shades / 256 - 1, 0].max
+      g = [g256 * num_shades / 256 - 1, 0].max
+      b = [b256 * num_shades / 256 - 1, 0].max
+      color = 16 + r*num_shades*num_shades + g*num_shades + b # move them to their offsets, I think 16 is for the system colors
+    end
+    "\e[48;5;#{color}m  \e[49m"
+  }
+  .each_slice(image.width)
+  .map { |row| print *row, "\n" }
