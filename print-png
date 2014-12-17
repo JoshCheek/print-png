@@ -25,9 +25,9 @@ image
     else
       # percentage of 256, rendered to 0-5
       num_shades = 6
-      r = [r256 * num_shades / 256 - 1, 0].max
-      g = [g256 * num_shades / 256 - 1, 0].max
-      b = [b256 * num_shades / 256 - 1, 0].max
+      r = r256 * num_shades / 256
+      g = g256 * num_shades / 256
+      b = b256 * num_shades / 256
       color = 16 + r*num_shades*num_shades + g*num_shades + b # move them to their offsets, I think 16 is for the system colors
     end
     "\e[48;5;#{color}m  \e[49m"
