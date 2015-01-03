@@ -16,12 +16,14 @@ image     = ChunkyPNG::Image.from_file(ARGV.first)
 image
   .pixels
   .map { |pixel|
-    r256, g256, b256, _ = pixel.to_s(16).rjust(8, '0').scan(/../).map { |s| s.to_i 16 }
+    r256, g256, b256, a256 = pixel.to_s(16).rjust(8, '0').scan(/../).map { |s| s.to_i 16 }
     if grayscale
       # no idea how it works, stole it from https://github.com/wvanbergen/chunky_png/blob/143dfbb768be5770b814e08518f7580dbe859bcf/lib/chunky_png/color.rb#L436
       num_shades = 24
       offset     = 232
       color      = offset + (r256*30 + g256*59 + b256*11) * num_shades / (256*100)
+    elsif a256 == 0x00
+      color = "0;49"
     else
       # percentage of 256, rendered to 0-5
       num_shades = 6
